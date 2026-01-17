@@ -41,24 +41,22 @@ struct TimerView: View {
 
             Spacer()
 
-            // Time Picker (only visible when idle)
-            if viewModel.state == .idle {
-                TimerPickerView(
-                    hours: Binding(
-                        get: { viewModel.selectedHours },
-                        set: { viewModel.selectedHours = $0 }
-                    ),
-                    minutes: Binding(
-                        get: { viewModel.selectedMinutes },
-                        set: { viewModel.selectedMinutes = $0 }
-                    ),
-                    seconds: Binding(
-                        get: { viewModel.selectedSeconds },
-                        set: { viewModel.selectedSeconds = $0 }
-                    )
+            // Time Picker (always visible)
+            TimerPickerView(
+                hours: Binding(
+                    get: { viewModel.selectedHours },
+                    set: { viewModel.selectedHours = $0 }
+                ),
+                minutes: Binding(
+                    get: { viewModel.selectedMinutes },
+                    set: { viewModel.selectedMinutes = $0 }
+                ),
+                seconds: Binding(
+                    get: { viewModel.selectedSeconds },
+                    set: { viewModel.selectedSeconds = $0 }
                 )
-                .padding(.horizontal)
-            }
+            )
+            .padding(.horizontal)
 
             Spacer()
 
