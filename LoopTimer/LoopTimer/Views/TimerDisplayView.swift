@@ -15,14 +15,13 @@ struct TimerDisplayView: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            if !isIdle {
-                Text(displayMode == .elapsed ? "+" : "-")
-                    .font(.system(size: 60, weight: .thin, design: .monospaced))
-                    .foregroundColor(.secondary)
-            }
+            Text(displayMode == .elapsed ? "+" : "-")
+                .font(.system(size: 50, weight: .thin, design: .monospaced))
+                .foregroundColor(.secondary)
+                .opacity(isIdle ? 0 : 1)
 
             Text(timeInterval.formattedTime())
-                .font(.system(size: 60, weight: .thin, design: .monospaced))
+                .font(.system(size: 50, weight: .thin, design: .monospaced))
                 .foregroundColor(isIdle ? .secondary : .primary)
                 .animation(.easeInOut(duration: 0.3), value: timeInterval)
                 .contentTransition(.numericText())

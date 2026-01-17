@@ -19,13 +19,8 @@ struct TimerControlsView: View {
                 let impact = UIImpactFeedbackGenerator(style: .medium)
                 impact.impactOccurred()
 
-                if state == .running {
-                    // When running, pause button stops the timer
-                    onStop()
-                } else {
-                    // When idle, play button starts the timer
-                    onPlayPause()
-                }
+                // togglePlayPause handles all states: idle->start, running->pause, paused->resume
+                onPlayPause()
             }) {
                 Image(systemName: playPauseIcon)
                     .font(.system(size: 40))
