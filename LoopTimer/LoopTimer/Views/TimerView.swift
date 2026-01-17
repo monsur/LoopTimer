@@ -48,18 +48,6 @@ struct TimerView: View {
                 isIdle: viewModel.state == .idle
             )
 
-            // Progress Bar (only visible when timer is active)
-            if viewModel.state != .idle {
-                ProgressView(value: viewModel.progress)
-                    .progressViewStyle(.linear)
-                    .frame(height: 8)
-                    .padding(.horizontal, 40)
-
-                Text("Loop \(viewModel.completedLoops + 1)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
             Spacer()
 
             // Time Picker (only visible when idle)
