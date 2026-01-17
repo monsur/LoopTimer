@@ -11,24 +11,29 @@ struct TimerDisplayView: View {
     let timeInterval: TimeInterval
     var displayMode: DisplayMode = .elapsed
     let isIdle: Bool
+    var onTap: (() -> Void)? = nil
 
     var body: some View {
-        VStack(spacing: 8) {
+        HStack(spacing: 4) {
+            if !isIdle {
+                Text(displayMode == .elapsed ? "+" : "-")
+                    .font(.system(size: 60, weight: .thin, design: .monospaced))
+                    .foregroundColor(.secondary)
+            }
+
             Text(timeInterval.formattedTime())
-                .font(.system(size: 72, weight: .thin, design: .monospaced))
+                .font(.system(size: 60, weight: .thin, design: .monospaced))
                 .foregroundColor(isIdle ? .secondary : .primary)
                 .animation(.easeInOut(duration: 0.3), value: timeInterval)
                 .contentTransition(.numericText())
-
-            if !isIdle {
-                Text(displayMode.rawValue)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .animation(.easeInOut(duration: 0.3), value: displayMode)
-            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
+        .padding(.horizontal, 20)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap?()
+        }
     }
 }
 

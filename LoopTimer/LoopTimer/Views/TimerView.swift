@@ -26,26 +26,17 @@ struct TimerView: View {
         VStack(spacing: 20) {
             Spacer()
 
-            // Display Mode Toggle (only when timer is active)
-            if viewModel.state != .idle {
-                Picker("Display Mode", selection: Binding(
-                    get: { viewModel.displayMode },
-                    set: { viewModel.displayMode = $0 }
-                )) {
-                    ForEach(DisplayMode.allCases, id: \.self) { mode in
-                        Text(mode.rawValue).tag(mode)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 40)
-            }
-
             // Timer Display
             TimerDisplayView(
                 timeInterval: viewModel.state == .idle ? 0 :
                     (viewModel.displayMode == .elapsed ? viewModel.elapsedTime : viewModel.remainingTime),
                 displayMode: viewModel.displayMode,
-                isIdle: viewModel.state == .idle
+                isIdle: viewModel.state == .idle,
+                onTap: {
+                    if viewModel.state != .idle {
+                        viewModel.displayMode = viewModel.displayMode == .elapsed ? .remaining : .elapsed
+                    }
+                }
             )
 
             Spacer()
