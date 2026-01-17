@@ -10,11 +10,11 @@ import Foundation
 
 class AudioService {
     private var audioPlayer: AVAudioPlayer?
-    private var currentChime: ChimeOption
+    private let chimeFileName = "chime_bell" // Hardcoded bell chime
 
-    init(chime: ChimeOption = .bell) {
-        self.currentChime = chime
+    init() {
         setupAudioSession()
+        prepareAudioPlayer()
     }
 
     // MARK: - Audio Session Setup
@@ -38,14 +38,7 @@ class AudioService {
 
     // MARK: - Public Methods
 
-    func setChime(_ chime: ChimeOption) {
-        currentChime = chime
-        prepareAudioPlayer()
-    }
-
     func playChime() {
-        guard currentChime != .none else { return }
-
         // Ensure audio session is active
         setupAudioSession()
 
@@ -53,32 +46,11 @@ class AudioService {
         audioPlayer?.play()
     }
 
-    func previewChime(_ chime: ChimeOption) {
-        guard chime != .none else { return }
-
-        // Temporarily prepare and play the preview chime
-        if let fileName = chime.fileName,
-           let soundURL = Bundle.main.url(forResource: fileName, withExtension: "caf") {
-            do {
-                let player = try AVAudioPlayer(contentsOf: soundURL)
-                player.prepareToPlay()
-                player.play()
-            } catch {
-                print("Failed to play preview chime: \(error)")
-            }
-        }
-    }
-
     // MARK: - Private Methods
 
     private func prepareAudioPlayer() {
-        guard let fileName = currentChime.fileName else {
-            audioPlayer = nil
-            return
-        }
-
-        guard let soundURL = Bundle.main.url(forResource: fileName, withExtension: "caf") else {
-            print("Audio file not found: \(fileName).caf")
+        guard let soundURL = Bundle.main.url(forResource: chimeFileName, withExtension: "caf") else {
+            print("Audio file not found: \(chimeFileName).caf")
             audioPlayer = nil
             return
         }

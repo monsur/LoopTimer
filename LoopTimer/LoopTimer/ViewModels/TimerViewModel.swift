@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import SwiftUI
-import SwiftData
 
 class TimerViewModel: ObservableObject {
     @Published var selectedHours: Int = 0
@@ -19,16 +18,7 @@ class TimerViewModel: ObservableObject {
     private let timerService: TimerService
     private let audioService: AudioService
     private let liveActivityService: LiveActivityService
-    private var modelContext: ModelContext?
     private var cancellables = Set<AnyCancellable>()
-
-    private var timerStartDate: Date?
-
-    @AppStorage("selectedChime") private var selectedChimeRaw: String = ChimeOption.bell.rawValue
-
-    private var selectedChime: ChimeOption {
-        ChimeOption(rawValue: selectedChimeRaw) ?? .bell
-    }
 
     var state: TimerState {
         timerService.state
@@ -54,14 +44,10 @@ class TimerViewModel: ObservableObject {
         timerService.progress
     }
 
-    init(timerService: TimerService = TimerService(), audioService: AudioService = AudioService(), liveActivityService: LiveActivityService = LiveActivityService(), modelContext: ModelContext? = nil) {
+    init(timerService: TimerService = TimerService(), audioService: AudioService = AudioService(), liveActivityService: LiveActivityService = LiveActivityService()) {
         self.timerService = timerService
         self.audioService = audioService
         self.liveActivityService = liveActivityService
-        self.modelContext = modelContext
-
-        // Configure audio service with saved chime preference
-        audioService.setChime(selectedChime)
 
         // Set up loop completion handler
         timerService.onLoopComplete = { [weak self] in
@@ -92,9 +78,7 @@ class TimerViewModel: ObservableObject {
     }
 
     private func handleLoopComplete() {
-        // Update audio service with current chime selection
-        audioService.setChime(selectedChime)
-        // Play the chime
+        // Play the hardcoded bell chime
         audioService.playChime()
     }
 
@@ -103,7 +87,6 @@ class TimerViewModel: ObservableObject {
     func startTimer() {
         let duration = TimeInterval(selectedHours * 3600 + selectedMinutes * 60 + selectedSeconds)
         guard duration > 0 else { return }
-        timerStartDate = Date()
         timerService.start(duration: duration)
         liveActivityService.startActivity(duration: duration, startDate: Date())
     }
@@ -119,10 +102,8 @@ class TimerViewModel: ObservableObject {
     }
 
     func stopTimer() {
-        saveTimerInstance()
         timerService.stop()
         liveActivityService.endActivity()
-        timerStartDate = nil
     }
 
     private func updateLiveActivity() {
@@ -135,30 +116,6 @@ class TimerViewModel: ObservableObject {
         )
     }
 
-    private func saveTimerInstance() {
-        guard let modelContext = modelContext,
-              let startDate = timerStartDate,
-              timerDuration > 0 else {
-            return
-        }
-
-        let instance = TimerInstance(
-            duration: timerDuration,
-            startedAt: startDate,
-            stoppedAt: Date(),
-            completedLoops: completedLoops,
-            chimeName: selectedChime.rawValue
-        )
-
-        modelContext.insert(instance)
-
-        do {
-            try modelContext.save()
-        } catch {
-            print("Failed to save timer instance: \(error)")
-        }
-    }
-
     func togglePlayPause() {
         switch state {
         case .idle:
@@ -168,9 +125,5 @@ class TimerViewModel: ObservableObject {
         case .paused:
             resumeTimer()
         }
-    }
-
-    func setModelContext(_ context: ModelContext) {
-        self.modelContext = context
     }
 }

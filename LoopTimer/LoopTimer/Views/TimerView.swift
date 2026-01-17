@@ -6,18 +6,13 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct TimerView: View {
-    @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = TimerViewModel()
 
     var body: some View {
         NavigationStack {
             timerContent()
-        }
-        .onAppear {
-            viewModel.setModelContext(modelContext)
         }
     }
 
