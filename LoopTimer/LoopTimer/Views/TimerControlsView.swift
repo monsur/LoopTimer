@@ -14,25 +14,31 @@ struct TimerControlsView: View {
 
     var body: some View {
         HStack(spacing: 40) {
-            // Single Play/Pause Button
-            Button(action: {
-                let impact = UIImpactFeedbackGenerator(style: .medium)
-                impact.impactOccurred()
+            // Single Play/Pause Button with Long Press to Reset
+            Image(systemName: playPauseIcon)
+                .font(.system(size: 40))
+                .foregroundColor(.white)
+                .frame(width: 80, height: 80)
+                .background(
+                    Circle()
+                        .fill(buttonColor)
+                )
+                .onTapGesture {
+                    let impact = UIImpactFeedbackGenerator(style: .medium)
+                    impact.impactOccurred()
 
-                // togglePlayPause handles all states: idle->start, running->pause, paused->resume
-                onPlayPause()
-            }) {
-                Image(systemName: playPauseIcon)
-                    .font(.system(size: 40))
-                    .foregroundColor(.white)
-                    .frame(width: 80, height: 80)
-                    .background(
-                        Circle()
-                            .fill(buttonColor)
-                    )
-            }
-            .buttonStyle(.plain)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: state)
+                    // togglePlayPause handles all states: idle->start, running->pause, paused->resume
+                    onPlayPause()
+                }
+                .onLongPressGesture(minimumDuration: 0.5) {
+                    // Only allow stop when timer is running or paused
+                    if state == .running || state == .paused {
+                        let impact = UIImpactFeedbackGenerator(style: .heavy)
+                        impact.impactOccurred()
+                        onStop()
+                    }
+                }
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: state)
         }
         .padding()
     }
