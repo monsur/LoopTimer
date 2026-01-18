@@ -11,17 +11,22 @@ struct TimerDisplayView: View {
     let timeInterval: TimeInterval
     var displayMode: DisplayMode = .elapsed
     let isIdle: Bool
+    let isPaused: Bool
     var onTap: (() -> Void)? = nil
+
+    private var textColor: Color {
+        isIdle || isPaused ? .secondary : .primary
+    }
 
     var body: some View {
         HStack(spacing: 4) {
             Text(displayMode == .elapsed ? "+" : "-")
                 .font(.system(size: 50, weight: .thin, design: .monospaced))
-                .foregroundColor(.secondary)
+                .foregroundColor(textColor)
 
             Text(timeInterval.formattedTime())
                 .font(.system(size: 50, weight: .thin, design: .monospaced))
-                .foregroundColor(isIdle ? .secondary : .primary)
+                .foregroundColor(textColor)
                 .animation(.easeInOut(duration: 0.3), value: timeInterval)
                 .contentTransition(.numericText())
         }
@@ -37,9 +42,9 @@ struct TimerDisplayView: View {
 
 #Preview {
     VStack(spacing: 40) {
-        TimerDisplayView(timeInterval: 0, isIdle: true)
-        TimerDisplayView(timeInterval: 125.5, displayMode: .elapsed, isIdle: false)
-        TimerDisplayView(timeInterval: 175, displayMode: .remaining, isIdle: false)
-        TimerDisplayView(timeInterval: 3665, displayMode: .elapsed, isIdle: false)
+        TimerDisplayView(timeInterval: 0, isIdle: true, isPaused: false)
+        TimerDisplayView(timeInterval: 125.5, displayMode: .elapsed, isIdle: false, isPaused: false)
+        TimerDisplayView(timeInterval: 175, displayMode: .remaining, isIdle: false, isPaused: true)
+        TimerDisplayView(timeInterval: 3665, displayMode: .elapsed, isIdle: false, isPaused: false)
     }
 }

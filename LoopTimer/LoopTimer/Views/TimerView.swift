@@ -28,6 +28,7 @@ struct TimerView: View {
                     (viewModel.displayMode == .elapsed ? viewModel.elapsedTime : viewModel.remainingTime),
                 displayMode: viewModel.displayMode,
                 isIdle: viewModel.state == .idle,
+                isPaused: viewModel.state == .paused,
                 onTap: {
                     if viewModel.state != .idle {
                         viewModel.displayMode = viewModel.displayMode == .elapsed ? .remaining : .elapsed
