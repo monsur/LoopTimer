@@ -118,16 +118,15 @@ Each phase was tested before moving to the next, ensuring a solid foundation.
 
 Possible features for future versions:
 
-- [ ] Loop counter display in main UI ("Loop 3 of ∞")
+- [ ] UI Updates
+- [ ] Fix UI in different orientations
+- [ ] Home Screen widget
 - [ ] Multiple concurrent timers
 - [ ] Preset timer buttons (30s, 1m, 5m quick start)
 - [ ] Timer history log with session tracking
-- [ ] Apple Watch companion app
-- [ ] Siri shortcuts integration
-- [ ] Home Screen widget
-- [ ] Timer statistics and analytics
-- [ ] Custom chime upload
 - [ ] Additional built-in chime sounds
+- [ ] Custom chime upload
+- [ ] Apple Watch companion app
 
 ## Contributing
 
