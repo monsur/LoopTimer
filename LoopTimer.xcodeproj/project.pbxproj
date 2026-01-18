@@ -37,6 +37,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9371863E2F1D417E00715C35 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9392086C2F1C0F6600314F92 /* LoopTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoopTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		939208B32F1C123F00314F92 /* LoopTimerWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LoopTimerWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		939208B52F1C123F00314F92 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -121,6 +122,7 @@
 		939208632F1C0F6600314F92 = {
 			isa = PBXGroup;
 			children = (
+				9371863E2F1D417E00715C35 /* README.md */,
 				939208D82F1C148D00314F92 /* LoopTimerWidgetExtensionExtension.entitlements */,
 				9392086E2F1C0F6600314F92 /* LoopTimer */,
 				939208B92F1C123F00314F92 /* LoopTimerWidgetExtension */,
