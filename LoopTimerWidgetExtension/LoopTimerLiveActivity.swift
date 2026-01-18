@@ -82,8 +82,8 @@ struct LoopTimerLiveActivity: Widget {
             progressBar(context: context)
         }
         .padding()
-        .activityBackgroundTint(Color.black.opacity(0.25))
-        .activitySystemActionForegroundColor(.white)
+        .activityBackgroundTint(Color(.systemGray6).opacity(0.8))
+        .activitySystemActionForegroundColor(Color.primary)
     }
 
     @ViewBuilder

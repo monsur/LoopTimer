@@ -58,7 +58,7 @@ struct TimerView: View {
                         Spacer()
                         Text(formatDuration(minutes: viewModel.selectedMinutes, seconds: viewModel.selectedSeconds))
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                             .padding(.bottom, 8)
                     }
                 }
