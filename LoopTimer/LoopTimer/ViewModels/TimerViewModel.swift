@@ -14,6 +14,7 @@ class TimerViewModel: ObservableObject {
     @Published var selectedMinutes: Int = 5
     @Published var selectedSeconds: Int = 0
     @Published var displayMode: DisplayMode = .elapsed
+    @AppStorage("selectedChimeSound") private var selectedChimeSound: String = "Bell"
 
     private let timerService: TimerService
     private let audioService: AudioService
@@ -78,8 +79,7 @@ class TimerViewModel: ObservableObject {
     }
 
     private func handleLoopComplete() {
-        // Play the hardcoded bell chime
-        audioService.playChime()
+        audioService.playChime(soundName: selectedChimeSound)
     }
 
     // MARK: - Public Methods

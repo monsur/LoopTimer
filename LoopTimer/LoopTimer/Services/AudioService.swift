@@ -11,16 +11,9 @@ import Foundation
 
 class AudioService {
     private var audioPlayer: AVAudioPlayer?
-    private let chimeFileName = "chime_bell" // Hardcoded bell chime
-    private var useSystemSoundFallback: Bool = false
 
     init() {
         setupAudioSession()
-        useSystemSoundFallback = !prepareAudioPlayer()
-
-        if useSystemSoundFallback {
-            print("Using system sound fallback (audio file not found)")
-        }
     }
 
     // MARK: - Audio Session Setup
@@ -44,36 +37,32 @@ class AudioService {
 
     // MARK: - Public Methods
 
-    func playChime() {
-        if useSystemSoundFallback {
-            // Use system sound as fallback (1013 is a nice bell sound)
-            AudioServicesPlaySystemSound(1013)
-        } else {
-            // Ensure audio session is active
-            setupAudioSession()
-
-            // Play the chime
-            audioPlayer?.play()
+    func playChime(soundName: String = "Bell") {
+        // Find the sound in the list
+        guard let sound = ChimeSound.allSounds.first(where: { $0.id == soundName }) else {
+            print("Sound not found: \(soundName), using fallback")
+            AudioServicesPlaySystemSound(1013)  // System bell fallback
+            return
         }
-    }
 
-    // MARK: - Private Methods
-
-    private func prepareAudioPlayer() -> Bool {
-        guard let soundURL = Bundle.main.url(forResource: chimeFileName, withExtension: "caf") else {
-            print("Audio file not found: \(chimeFileName).caf")
-            audioPlayer = nil
-            return false
+        // Get URL from bundle
+        guard let soundURL = sound.bundleURL else {
+            print("Sound file not found in bundle: \(sound.fileName).\(sound.fileExtension)")
+            AudioServicesPlaySystemSound(1013)  // System bell fallback
+            return
         }
 
         do {
+            // Ensure audio session is active
+            try AVAudioSession.sharedInstance().setActive(true)
+
+            // Create and play audio player
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
-            audioPlayer?.prepareToPlay()
-            return true
+            audioPlayer?.play()
         } catch {
-            print("Failed to prepare audio player: \(error)")
-            audioPlayer = nil
-            return false
+            print("Failed to play sound from bundle: \(error)")
+            // Fallback to system sound
+            AudioServicesPlaySystemSound(1013)
         }
     }
 }
