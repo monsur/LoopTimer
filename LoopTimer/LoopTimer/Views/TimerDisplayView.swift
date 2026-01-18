@@ -18,7 +18,6 @@ struct TimerDisplayView: View {
             Text(displayMode == .elapsed ? "+" : "-")
                 .font(.system(size: 50, weight: .thin, design: .monospaced))
                 .foregroundColor(.secondary)
-                .opacity(isIdle ? 0 : 1)
 
             Text(timeInterval.formattedTime())
                 .font(.system(size: 50, weight: .thin, design: .monospaced))

@@ -13,7 +13,7 @@ class TimerViewModel: ObservableObject {
     @AppStorage("selectedHours") var selectedHours: Int = 0
     @AppStorage("selectedMinutes") var selectedMinutes: Int = 5
     @AppStorage("selectedSeconds") var selectedSeconds: Int = 0
-    @Published var displayMode: DisplayMode = .elapsed
+    @AppStorage("displayMode") var displayMode: DisplayMode = .elapsed
     @AppStorage("selectedChimeSound") private var selectedChimeSound: String = "Bell"
 
     private let timerService: TimerService
