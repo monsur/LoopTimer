@@ -37,22 +37,32 @@ struct TimerView: View {
 
             Spacer()
 
-            // Time Picker (always visible)
-            TimerPickerView(
-                hours: Binding(
-                    get: { viewModel.selectedHours },
-                    set: { viewModel.selectedHours = $0 }
-                ),
-                minutes: Binding(
-                    get: { viewModel.selectedMinutes },
-                    set: { viewModel.selectedMinutes = $0 }
-                ),
-                seconds: Binding(
-                    get: { viewModel.selectedSeconds },
-                    set: { viewModel.selectedSeconds = $0 }
-                )
-            )
-            .padding(.horizontal)
+            // Time Picker (visible only when idle) or Duration Text
+            ZStack {
+                if viewModel.state == .idle {
+                    TimerPickerView(
+                        hours: Binding(
+                            get: { viewModel.selectedHours },
+                            set: { viewModel.selectedHours = $0 }
+                        ),
+                        minutes: Binding(
+                            get: { viewModel.selectedMinutes },
+                            set: { viewModel.selectedMinutes = $0 }
+                        ),
+                        seconds: Binding(
+                            get: { viewModel.selectedSeconds },
+                            set: { viewModel.selectedSeconds = $0 }
+                        )
+                    )
+                    .padding(.horizontal)
+                } else {
+                    // Show timer duration when running or paused
+                    Text(formatDuration(hours: viewModel.selectedHours, minutes: viewModel.selectedMinutes, seconds: viewModel.selectedSeconds))
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+            }
+            .frame(height: 200)
 
             Spacer()
 
@@ -80,6 +90,22 @@ struct TimerView: View {
         .sheet(isPresented: $showingSettings) {
             SettingsView()
         }
+    }
+
+    private func formatDuration(hours: Int, minutes: Int, seconds: Int) -> String {
+        var parts: [String] = []
+
+        if hours > 0 {
+            parts.append("\(hours) hr")
+        }
+        if minutes > 0 {
+            parts.append("\(minutes) min")
+        }
+        if seconds > 0 {
+            parts.append("\(seconds) sec")
+        }
+
+        return parts.isEmpty ? "0 sec" : parts.joined(separator: " ")
     }
 }
 
