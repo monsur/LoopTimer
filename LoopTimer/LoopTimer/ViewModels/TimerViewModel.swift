@@ -10,9 +10,9 @@ import Combine
 import SwiftUI
 
 class TimerViewModel: ObservableObject {
-    @Published var selectedHours: Int = 0
-    @Published var selectedMinutes: Int = 5
-    @Published var selectedSeconds: Int = 0
+    @AppStorage("selectedHours") var selectedHours: Int = 0
+    @AppStorage("selectedMinutes") var selectedMinutes: Int = 5
+    @AppStorage("selectedSeconds") var selectedSeconds: Int = 0
     @Published var displayMode: DisplayMode = .elapsed
     @AppStorage("selectedChimeSound") private var selectedChimeSound: String = "Bell"
 
