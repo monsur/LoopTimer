@@ -110,18 +110,11 @@ class TimerService: ObservableObject {
 
             // Check for loop completion
             if elapsed >= self.timerDuration {
-                // Calculate how many loops completed
-                let totalLoops = Int(elapsed / self.timerDuration)
-                let newLoops = totalLoops - self.completedLoops
+                // Play chime
+                self.onLoopComplete?()
 
-                if newLoops > 0 {
-                    self.completedLoops = totalLoops
-
-                    // Trigger chime for each completed loop
-                    for _ in 0..<newLoops {
-                        self.onLoopComplete?()
-                    }
-                }
+                // Increment loop counter
+                self.completedLoops += 1
 
                 // Reset elapsed time to remainder
                 self.elapsedTime = elapsed.truncatingRemainder(dividingBy: self.timerDuration)
