@@ -9,6 +9,13 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
+@main
+struct LoopTimerWidgets: WidgetBundle {
+    var body: some Widget {
+        LoopTimerLiveActivity()
+    }
+}
+
 struct LoopTimerLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TimerActivityAttributes.self) { context in
@@ -128,24 +135,5 @@ struct LoopTimerLiveActivity: Widget {
     private func timerText(context: ActivityViewContext<TimerActivityAttributes>) -> String {
         let remaining = context.attributes.timerDuration - context.state.elapsedTime
         return max(0, remaining).formattedTimeShort()
-    }
-}
-
-// Extension to use TimeInterval formatting from main app
-extension TimeInterval {
-    func formattedTime() -> String {
-        let hours = Int(self) / 3600
-        let minutes = Int(self) / 60 % 60
-        let seconds = Int(self) % 60
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
-    func formattedTimeShort() -> String {
-        if self < 3600 {
-            let minutes = Int(self) / 60
-            let seconds = Int(self) % 60
-            return String(format: "%02d:%02d", minutes, seconds)
-        }
-        return formattedTime()
     }
 }
