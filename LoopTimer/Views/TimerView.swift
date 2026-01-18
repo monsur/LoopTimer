@@ -42,10 +42,6 @@ struct TimerView: View {
             Group {
                 if viewModel.state == .idle {
                     TimerPickerView(
-                        hours: Binding(
-                            get: { viewModel.selectedHours },
-                            set: { viewModel.selectedHours = $0 }
-                        ),
                         minutes: Binding(
                             get: { viewModel.selectedMinutes },
                             set: { viewModel.selectedMinutes = $0 }
@@ -60,7 +56,7 @@ struct TimerView: View {
                     // Show timer duration when running or paused
                     VStack {
                         Spacer()
-                        Text(formatDuration(hours: viewModel.selectedHours, minutes: viewModel.selectedMinutes, seconds: viewModel.selectedSeconds))
+                        Text(formatDuration(minutes: viewModel.selectedMinutes, seconds: viewModel.selectedSeconds))
                             .font(.subheadline)
                             .foregroundColor(.gray)
                             .padding(.bottom, 8)
@@ -68,8 +64,6 @@ struct TimerView: View {
                 }
             }
             .frame(height: 200)
-
-            Spacer()
 
             // Control Buttons
             TimerControlsView(
@@ -97,12 +91,9 @@ struct TimerView: View {
         }
     }
 
-    private func formatDuration(hours: Int, minutes: Int, seconds: Int) -> String {
+    private func formatDuration(minutes: Int, seconds: Int) -> String {
         var parts: [String] = []
 
-        if hours > 0 {
-            parts.append("\(hours) hr")
-        }
         if minutes > 0 {
             parts.append("\(minutes) min")
         }

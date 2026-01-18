@@ -134,6 +134,6 @@ struct LoopTimerLiveActivity: Widget {
 
     private func timerText(context: ActivityViewContext<TimerActivityAttributes>) -> String {
         let remaining = context.attributes.timerDuration - context.state.elapsedTime
-        return max(0, remaining).formattedTimeShort()
+        return max(0, remaining).formattedTime()
     }
 }

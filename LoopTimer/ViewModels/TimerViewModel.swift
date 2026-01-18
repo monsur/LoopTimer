@@ -10,7 +10,6 @@ import Combine
 import SwiftUI
 
 class TimerViewModel: ObservableObject {
-    @AppStorage("selectedHours") var selectedHours: Int = 0
     @AppStorage("selectedMinutes") var selectedMinutes: Int = 5
     @AppStorage("selectedSeconds") var selectedSeconds: Int = 0
     @AppStorage("displayMode") var displayMode: DisplayMode = .elapsed
@@ -85,7 +84,7 @@ class TimerViewModel: ObservableObject {
     // MARK: - Public Methods
 
     func startTimer() {
-        let duration = TimeInterval(selectedHours * 3600 + selectedMinutes * 60 + selectedSeconds)
+        let duration = TimeInterval(selectedMinutes * 60 + selectedSeconds)
         guard duration > 0 else { return }
         timerService.start(duration: duration)
         liveActivityService.startActivity(duration: duration, startDate: Date())

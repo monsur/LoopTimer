@@ -21,11 +21,11 @@ struct TimerDisplayView: View {
     var body: some View {
         HStack(spacing: 4) {
             Text(displayMode == .elapsed ? "+" : "-")
-                .font(.system(size: 50, weight: .thin, design: .monospaced))
+                .font(.system(size: 70, weight: .thin, design: .monospaced))
                 .foregroundColor(textColor)
 
             Text(timeInterval.formattedTime())
-                .font(.system(size: 50, weight: .thin, design: .monospaced))
+                .font(.system(size: 70, weight: .thin, design: .monospaced))
                 .foregroundColor(textColor)
                 .animation(.easeInOut(duration: 0.3), value: timeInterval)
                 .contentTransition(.numericText(countsDown: displayMode == .remaining))
