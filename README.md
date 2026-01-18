@@ -120,6 +120,7 @@ Possible features for future versions:
 
 - [ ] UI Updates
 - [ ] Fix UI in different orientations
+- [ ] Dark mode/Light mode
 - [ ] Home Screen widget
 - [ ] Multiple concurrent timers
 - [ ] Preset timer buttons (30s, 1m, 5m quick start)
