@@ -39,7 +39,7 @@ struct TimerView: View {
             Spacer()
 
             // Time Picker (visible only when idle) or Duration Text
-            ZStack {
+            Group {
                 if viewModel.state == .idle {
                     TimerPickerView(
                         hours: Binding(
@@ -58,9 +58,13 @@ struct TimerView: View {
                     .padding(.horizontal)
                 } else {
                     // Show timer duration when running or paused
-                    Text(formatDuration(hours: viewModel.selectedHours, minutes: viewModel.selectedMinutes, seconds: viewModel.selectedSeconds))
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+                    VStack {
+                        Spacer()
+                        Text(formatDuration(hours: viewModel.selectedHours, minutes: viewModel.selectedMinutes, seconds: viewModel.selectedSeconds))
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .padding(.bottom, 8)
+                    }
                 }
             }
             .frame(height: 200)
