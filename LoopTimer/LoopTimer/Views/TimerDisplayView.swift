@@ -28,7 +28,7 @@ struct TimerDisplayView: View {
                 .font(.system(size: 50, weight: .thin, design: .monospaced))
                 .foregroundColor(textColor)
                 .animation(.easeInOut(duration: 0.3), value: timeInterval)
-                .contentTransition(.numericText())
+                .contentTransition(.numericText(countsDown: displayMode == .remaining))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
