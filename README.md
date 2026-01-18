@@ -1,18 +1,30 @@
 # Loop Timer for iOS
 
-A minimalist iOS timer app with automatic looping functionality, lock screen integration, and persistent history.
+A minimalist iOS timer app with automatic looping functionality, lock screen integration, and smart persistent state.
 
 ## Features
 
 - **⭕ Automatic Looping**: Timer automatically restarts when it reaches zero
 - **⏸️ Play/Pause Controls**: Start, pause, and resume the timer
-- **🔄 Display Toggle**: Switch between time elapsed and time remaining
-- **📜 Timer History**: Persistent list of previous timer sessions
-- **🔔 Chime Sounds**: Customizable sounds on loop completion (Bell, Soft, Digital, None)
+- **🔄 Display Toggle**: Switch between time elapsed and time remaining with tap
+- **➕➖ Visual Indicators**: Always shows +/- sign to indicate elapsed or remaining time
+- **🎬 Smart Animations**: Numbers animate in the correct direction (up for elapsed, down for remaining)
+- **🔔 Chime Sounds**: Customizable sounds on loop completion (Bell, Soft Chime)
 - **🔒 Lock Screen**: Live Activities show timer on lock screen with live updates
 - **🌙 Background Operation**: Timer continues running when app is backgrounded or screen is locked
 - **⚙️ Time Input**: Easy picker wheel interface (hours/minutes/seconds)
-- **🎨 Minimalist Design**: Clean, simple, and focused interface
+- **💾 Persistent Settings**: Timer duration and display mode are saved across app launches
+- **🎨 Smart UI**: Timer picker hides when active, replaced with duration text; colors adjust based on state
+- **🎯 Minimalist Design**: Clean, simple, and focused interface
+
+## UI/UX Highlights
+
+- **Tap to Toggle**: Tap the timer display to switch between elapsed and remaining time
+- **Visual Clarity**: Always shows +/- prefix to avoid confusion about elapsed vs remaining time
+- **State-Based Colors**: Timer display dims when idle or paused, vibrant when running
+- **Contextual Interface**: Time picker automatically hides when timer is active, showing duration text instead
+- **Smooth Transitions**: Numbers animate naturally in the correct direction based on counting mode
+- **Persistent Preferences**: All settings (duration, display mode, sound) automatically save
 
 ## Requirements
 
@@ -31,11 +43,11 @@ A minimalist iOS timer app with automatic looping functionality, lock screen int
 
 ```
 LoopTimer/
-├── Models/              # Data models (SwiftData & enums)
+├── Models/              # Data models (DisplayMode, ChimeSound, TimerState)
 ├── Services/            # Business logic (Timer, Audio, Live Activities)
-├── ViewModels/          # MVVM coordinators
-├── Views/              # SwiftUI views
-├── Extensions/         # Helper extensions
+├── ViewModels/          # MVVM coordinators (TimerViewModel)
+├── Views/              # SwiftUI views (TimerView, TimerDisplayView, etc.)
+├── Extensions/         # Helper extensions (TimeInterval, Date)
 └── Resources/          # Audio files and assets
 
 LoopTimerWidgetExtension/
@@ -46,8 +58,8 @@ LoopTimerWidgetExtension/
 
 The app follows **MVVM (Model-View-ViewModel)** architecture with service layer:
 
-- **Models**: SwiftData models and value types
-- **Services**: Core functionality (timer logic, audio, persistence, live activities)
+- **Models**: Value types and enums (DisplayMode, ChimeSound, TimerState)
+- **Services**: Core functionality (timer logic, audio, live activities)
 - **ViewModels**: Coordinate services and manage UI state
 - **Views**: SwiftUI views (presentation layer)
 
@@ -64,8 +76,9 @@ The app follows **MVVM (Model-View-ViewModel)** architecture with service layer:
 - Automatically routes to headphones/speaker
 
 ### Persistence
-- SwiftData for timer history
+- AppStorage for user preferences (timer duration, display mode, chime sound)
 - UserDefaults for timer state restoration
+- Settings persist across app launches
 - Minimal setup required
 
 ### Live Activities
@@ -79,7 +92,7 @@ See [SETUP_GUIDE.md](SETUP_GUIDE.md) for comprehensive testing checklist includi
 
 - Basic timer functionality
 - Audio playback
-- History persistence
+- Settings persistence
 - Background operation
 - Live Activities (requires physical device)
 
@@ -89,9 +102,9 @@ This project was built in 5 phases:
 
 1. **Phase 1**: Core timer foundation
 2. **Phase 2**: Audio integration
-3. **Phase 3**: Persistence & history
+3. **Phase 3**: Settings persistence & state restoration
 4. **Phase 4**: Live Activities
-5. **Phase 5**: Background operation & polish
+5. **Phase 5**: Background operation & UI polish
 
 Each phase was tested before moving to the next, ensuring a solid foundation.
 
@@ -105,15 +118,16 @@ Each phase was tested before moving to the next, ensuring a solid foundation.
 
 Possible features for future versions:
 
-- [ ] Loop counter display ("Loop 3 of ∞")
+- [ ] Loop counter display in main UI ("Loop 3 of ∞")
 - [ ] Multiple concurrent timers
 - [ ] Preset timer buttons (30s, 1m, 5m quick start)
+- [ ] Timer history log with session tracking
 - [ ] Apple Watch companion app
 - [ ] Siri shortcuts integration
 - [ ] Home Screen widget
-- [ ] iCloud sync for history
-- [ ] Timer statistics
+- [ ] Timer statistics and analytics
 - [ ] Custom chime upload
+- [ ] Additional built-in chime sounds
 
 ## Contributing
 
@@ -127,10 +141,10 @@ This project is provided as-is for educational and personal use.
 
 Built with:
 - SwiftUI
-- SwiftData
 - ActivityKit
 - AVFoundation
 - DispatchSourceTimer
+- Combine
 
 References:
 - [Apple's Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
