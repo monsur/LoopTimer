@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TimerView: View {
     @StateObject private var viewModel = TimerViewModel()
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationStack {
@@ -66,6 +67,19 @@ struct TimerView: View {
         }
         .navigationTitle("Loop Timer")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    showingSettings = true
+                }) {
+                    Image(systemName: "gearshape")
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
     }
 }
 
