@@ -9,6 +9,46 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 import AppIntents
+import Foundation
+
+// MARK: - App Intents
+
+@available(iOS 17.0, *)
+struct StopTimerIntent: LiveActivityIntent {
+    static var title: LocalizedStringResource = "Stop Timer"
+    static var description = IntentDescription("Stops the timer and dismisses the Live Activity")
+
+    func perform() async throws -> some IntentResult {
+        // Post notification to stop timer
+        await MainActor.run {
+            NotificationCenter.default.post(name: .stopTimerIntent, object: nil)
+        }
+        return .result()
+    }
+}
+
+@available(iOS 17.0, *)
+struct ToggleTimerIntent: LiveActivityIntent {
+    static var title: LocalizedStringResource = "Toggle Timer"
+    static var description = IntentDescription("Pauses or resumes the timer")
+
+    func perform() async throws -> some IntentResult {
+        // Post notification to toggle timer state
+        await MainActor.run {
+            NotificationCenter.default.post(name: .toggleTimerIntent, object: nil)
+        }
+        return .result()
+    }
+}
+
+// MARK: - Notification Names Extension
+
+extension Notification.Name {
+    static let stopTimerIntent = Notification.Name("stopTimerIntent")
+    static let toggleTimerIntent = Notification.Name("toggleTimerIntent")
+}
+
+// MARK: - Widget Bundle
 
 @main
 struct LoopTimerWidgets: WidgetBundle {
