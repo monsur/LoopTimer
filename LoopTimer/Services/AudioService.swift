@@ -37,7 +37,13 @@ class AudioService {
 
     // MARK: - Public Methods
 
-    func playChime(soundName: String = "Bell") {
+    func playChime(soundName: String = "Bell", isMuted: Bool = false) {
+        // Early exit if muted
+        guard !isMuted else {
+            print("Audio muted, skipping chime playback")
+            return
+        }
+
         // Find the sound in the list
         guard let sound = ChimeSound.allSounds.first(where: { $0.id == soundName }) else {
             print("Sound not found: \(soundName), using fallback")

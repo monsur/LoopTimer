@@ -14,6 +14,7 @@ class TimerViewModel: ObservableObject {
     @AppStorage("selectedSeconds") var selectedSeconds: Int = 0
     @AppStorage("displayMode") var displayMode: DisplayMode = .elapsed
     @AppStorage("selectedChimeSound") private var selectedChimeSound: String = "Bell"
+    @AppStorage("isMuted") var isMuted: Bool = false
 
     @Published var showNotificationWarning: Bool = false
 
@@ -90,7 +91,7 @@ class TimerViewModel: ObservableObject {
     }
 
     private func handleLoopComplete() {
-        audioService.playChime(soundName: selectedChimeSound)
+        audioService.playChime(soundName: selectedChimeSound, isMuted: isMuted)
 
         // Update Live Activity with new loop end date
         let newLoopEndDate = Date().addingTimeInterval(timerDuration)
@@ -98,13 +99,15 @@ class TimerViewModel: ObservableObject {
 
         // Reschedule notifications for next loops
         Task {
-            await notificationService.rescheduleFromDate(
-                Date(),
-                remainingTimeInCurrentLoop: timerDuration,
-                duration: timerDuration,
-                currentLoop: completedLoops + 1,
-                soundName: selectedChimeSound
-            )
+            if !isMuted {
+                await notificationService.rescheduleFromDate(
+                    Date(),
+                    remainingTimeInCurrentLoop: timerDuration,
+                    duration: timerDuration,
+                    currentLoop: completedLoops + 1,
+                    soundName: selectedChimeSound
+                )
+            }
         }
     }
 
@@ -234,7 +237,7 @@ class TimerViewModel: ObservableObject {
             // Check notification permission and show warning if needed
             await notificationService.checkAuthorizationStatus()
 
-            if notificationService.isAuthorized {
+            if notificationService.isAuthorized && !isMuted {
                 await notificationService.scheduleLoopNotifications(
                     startDate: startDate,
                     duration: duration,
@@ -247,7 +250,7 @@ class TimerViewModel: ObservableObject {
             } else {
                 // Request permission
                 let granted = await notificationService.requestPermissions()
-                if granted {
+                if granted && !isMuted {
                     await notificationService.scheduleLoopNotifications(
                         startDate: startDate,
                         duration: duration,
@@ -282,7 +285,7 @@ class TimerViewModel: ObservableObject {
 
         // Reschedule notifications
         Task {
-            if notificationService.isAuthorized {
+            if notificationService.isAuthorized && !isMuted {
                 await notificationService.rescheduleFromDate(
                     Date(),
                     remainingTimeInCurrentLoop: remaining,

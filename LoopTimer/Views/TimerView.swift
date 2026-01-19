@@ -78,6 +78,18 @@ struct TimerView: View {
         .navigationTitle("Loop Timer")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.isMuted.toggle()
+                    }
+                }) {
+                    Image(systemName: viewModel.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                        .foregroundColor(.secondary)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {
                     showingSettings = true
