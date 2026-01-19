@@ -2,7 +2,7 @@
 //  LiveActivityService.swift
 //  LoopTimer
 //
-//  Manages Live Activity lifecycle
+//  Manages Live Activity lifecycle with date-based countdown
 //
 
 import ActivityKit
@@ -10,11 +10,19 @@ import Foundation
 
 class LiveActivityService {
     private var currentActivity: Activity<TimerActivityAttributes>?
-    private var updateTimer: Timer?
+    private(set) var timerDuration: TimeInterval = 0
+
+    var hasActiveActivity: Bool {
+        currentActivity != nil
+    }
+
+    var currentActivityId: String? {
+        currentActivity?.id
+    }
 
     // MARK: - Public Methods
 
-    func startActivity(duration: TimeInterval, startDate: Date) {
+    func startActivity(duration: TimeInterval, loopEndDate: Date) {
         #if targetEnvironment(simulator)
         print("Live Activities not supported in simulator")
         return
@@ -28,15 +36,14 @@ class LiveActivityService {
         // End any existing activity
         endActivity()
 
-        let attributes = TimerActivityAttributes(
-            timerDuration: duration,
-            startDate: startDate
-        )
+        self.timerDuration = duration
+
+        let attributes = TimerActivityAttributes(timerDuration: duration)
 
         let initialState = TimerActivityAttributes.ContentState(
-            elapsedTime: 0,
+            loopEndDate: loopEndDate,
             isRunning: true,
-            currentLoop: 1
+            pausedRemainingTime: nil
         )
 
         do {
@@ -46,15 +53,12 @@ class LiveActivityService {
             )
             self.currentActivity = activity
             print("Live Activity started successfully")
-
-            // Start periodic updates
-            startPeriodicUpdates()
         } catch {
             print("Failed to start Live Activity: \(error)")
         }
     }
 
-    func updateActivity(elapsedTime: TimeInterval, isRunning: Bool, currentLoop: Int) {
+    func updateForLoopComplete(newLoopEndDate: Date) {
         #if targetEnvironment(simulator)
         return
         #endif
@@ -62,9 +66,45 @@ class LiveActivityService {
         guard let activity = currentActivity else { return }
 
         let updatedState = TimerActivityAttributes.ContentState(
-            elapsedTime: elapsedTime,
-            isRunning: isRunning,
-            currentLoop: currentLoop
+            loopEndDate: newLoopEndDate,
+            isRunning: true,
+            pausedRemainingTime: nil
+        )
+
+        Task {
+            await activity.update(ActivityContent(state: updatedState, staleDate: nil))
+        }
+    }
+
+    func updateForPause(remainingTime: TimeInterval) {
+        #if targetEnvironment(simulator)
+        return
+        #endif
+
+        guard let activity = currentActivity else { return }
+
+        let updatedState = TimerActivityAttributes.ContentState(
+            loopEndDate: Date(),  // Not used when paused
+            isRunning: false,
+            pausedRemainingTime: remainingTime
+        )
+
+        Task {
+            await activity.update(ActivityContent(state: updatedState, staleDate: nil))
+        }
+    }
+
+    func updateForResume(newLoopEndDate: Date) {
+        #if targetEnvironment(simulator)
+        return
+        #endif
+
+        guard let activity = currentActivity else { return }
+
+        let updatedState = TimerActivityAttributes.ContentState(
+            loopEndDate: newLoopEndDate,
+            isRunning: true,
+            pausedRemainingTime: nil
         )
 
         Task {
@@ -77,9 +117,6 @@ class LiveActivityService {
         return
         #endif
 
-        updateTimer?.invalidate()
-        updateTimer = nil
-
         guard let activity = currentActivity else { return }
 
         Task {
@@ -90,14 +127,40 @@ class LiveActivityService {
         currentActivity = nil
     }
 
-    // MARK: - Private Methods
+    func endAllActivities() {
+        #if targetEnvironment(simulator)
+        return
+        #endif
 
-    private func startPeriodicUpdates() {
-        // Update activity every 5 seconds to keep it in sync
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
-            // The activity will be updated by the timer service
-            // This timer is just to ensure periodic refresh
+        Task {
+            for activity in Activity<TimerActivityAttributes>.activities {
+                await activity.end(nil, dismissalPolicy: .immediate)
+            }
         }
+        currentActivity = nil
+    }
+
+    // MARK: - State Restoration
+
+    func attachToExistingActivity() -> (duration: TimeInterval, loopEndDate: Date, isRunning: Bool, remainingTime: TimeInterval?)? {
+        #if targetEnvironment(simulator)
+        return nil
+        #endif
+
+        guard let activity = Activity<TimerActivityAttributes>.activities.first else {
+            return nil
+        }
+
+        self.currentActivity = activity
+        self.timerDuration = activity.attributes.timerDuration
+
+        let state = activity.content.state
+        return (
+            duration: activity.attributes.timerDuration,
+            loopEndDate: state.loopEndDate,
+            isRunning: state.isRunning,
+            remainingTime: state.pausedRemainingTime
+        )
     }
 
     deinit {

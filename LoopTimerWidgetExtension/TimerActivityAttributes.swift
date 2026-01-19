@@ -10,12 +10,11 @@ import ActivityKit
 
 struct TimerActivityAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
-        var elapsedTime: TimeInterval
+        var loopEndDate: Date              // Widget calculates countdown to this date
         var isRunning: Bool
-        var currentLoop: Int
+        var pausedRemainingTime: TimeInterval?  // For paused state display (nil when running)
     }
 
     // Static properties that don't change
     let timerDuration: TimeInterval
-    let startDate: Date
 }

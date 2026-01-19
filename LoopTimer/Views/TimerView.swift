@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct TimerView: View {
     @StateObject private var viewModel = TimerViewModel()
@@ -88,6 +89,18 @@ struct TimerView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+        }
+        .alert("Background Chimes Disabled", isPresented: $viewModel.showNotificationWarning) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Continue Anyway", role: .cancel) {
+                viewModel.dismissNotificationWarning()
+            }
+        } message: {
+            Text("Notification permission is required to play chimes when the app is closed or in the background. The timer will still work, but you won't hear chimes unless the app is open.")
         }
     }
 

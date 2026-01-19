@@ -2,12 +2,13 @@
 //  LoopTimerLiveActivity.swift
 //  LoopTimerWidgetExtension
 //
-//  Live Activity widget for lock screen
+//  Live Activity widget for lock screen with client-side countdown
 //
 
 import ActivityKit
 import WidgetKit
 import SwiftUI
+import AppIntents
 
 @main
 struct LoopTimerWidgets: WidgetBundle {
@@ -25,30 +26,53 @@ struct LoopTimerLiveActivity: Widget {
             DynamicIsland {
                 // Expanded view
                 DynamicIslandExpandedRegion(.leading) {
-                    Image(systemName: "timer")
+                    Image(systemName: context.state.isRunning ? "timer" : "pause.fill")
                         .foregroundColor(.blue)
+                        .font(.title2)
                 }
 
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Loop \(context.state.currentLoop)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    countdownDisplay(context: context)
+                        .font(.title2.monospacedDigit())
+                        .fontWeight(.semibold)
                 }
 
                 DynamicIslandExpandedRegion(.bottom) {
-                    VStack(spacing: 8) {
-                        timerDisplay(context: context)
-                        progressBar(context: context)
+                    HStack(spacing: 16) {
+                        // Toggle play/pause button
+                        if #available(iOS 17.0, *) {
+                            Button(intent: ToggleTimerIntent()) {
+                                Image(systemName: context.state.isRunning ? "pause.fill" : "play.fill")
+                                    .font(.title3)
+                                    .frame(width: 44, height: 44)
+                                    .background(Color.blue.opacity(0.2))
+                                    .foregroundColor(.blue)
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+
+                        // Stop button
+                        if #available(iOS 17.0, *) {
+                            Button(intent: StopTimerIntent()) {
+                                Image(systemName: "xmark")
+                                    .font(.title3)
+                                    .frame(width: 44, height: 44)
+                                    .background(Color.red.opacity(0.2))
+                                    .foregroundColor(.red)
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
-                    .padding(.horizontal)
+                    .padding(.top, 8)
                 }
             } compactLeading: {
-                Image(systemName: "timer")
+                Image(systemName: context.state.isRunning ? "timer" : "pause.fill")
                     .foregroundColor(.blue)
             } compactTrailing: {
-                Text(timerText(context: context))
-                    .font(.caption2)
-                    .monospacedDigit()
+                countdownDisplay(context: context)
+                    .font(.caption2.monospacedDigit())
             } minimal: {
                 Image(systemName: "timer")
                     .foregroundColor(.blue)
@@ -68,18 +92,55 @@ struct LoopTimerLiveActivity: Widget {
 
                 Spacer()
 
-                Text("Loop \(context.state.currentLoop)")
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.blue.opacity(0.2))
-                    .foregroundColor(.blue)
-                    .cornerRadius(8)
+                if !context.state.isRunning {
+                    Text("Paused")
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.orange.opacity(0.2))
+                        .foregroundColor(.orange)
+                        .cornerRadius(8)
+                }
             }
 
-            timerDisplay(context: context)
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Remaining")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-            progressBar(context: context)
+                    countdownDisplay(context: context)
+                        .font(.title.monospacedDigit())
+                        .fontWeight(.semibold)
+                }
+
+                Spacer()
+
+                // Control buttons
+                HStack(spacing: 12) {
+                    if #available(iOS 17.0, *) {
+                        Button(intent: ToggleTimerIntent()) {
+                            Image(systemName: context.state.isRunning ? "pause.fill" : "play.fill")
+                                .font(.title2)
+                                .frame(width: 50, height: 50)
+                                .background(Color.blue.opacity(0.2))
+                                .foregroundColor(.blue)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+
+                        Button(intent: StopTimerIntent()) {
+                            Image(systemName: "xmark")
+                                .font(.title2)
+                                .frame(width: 50, height: 50)
+                                .background(Color.red.opacity(0.2))
+                                .foregroundColor(.red)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
         }
         .padding()
         .activityBackgroundTint(Color(.systemGray6).opacity(0.8))
@@ -87,53 +148,22 @@ struct LoopTimerLiveActivity: Widget {
     }
 
     @ViewBuilder
-    private func timerDisplay(context: ActivityViewContext<TimerActivityAttributes>) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Elapsed")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                Text(context.state.elapsedTime.formattedTime())
-                    .font(.title2.monospacedDigit())
-                    .fontWeight(.semibold)
-            }
-
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 4) {
-                Text("Remaining")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                let remaining = context.attributes.timerDuration - context.state.elapsedTime
-                Text(max(0, remaining).formattedTime())
-                    .font(.title2.monospacedDigit())
-                    .fontWeight(.semibold)
-            }
+    private func countdownDisplay(context: ActivityViewContext<TimerActivityAttributes>) -> some View {
+        if context.state.isRunning {
+            // Use client-side countdown when running
+            Text(timerInterval: Date()...context.state.loopEndDate, countsDown: true)
+        } else if let remaining = context.state.pausedRemainingTime {
+            // Show static time when paused
+            Text(formatTime(remaining))
+        } else {
+            Text("--:--")
         }
     }
 
-    @ViewBuilder
-    private func progressBar(context: ActivityViewContext<TimerActivityAttributes>) -> some View {
-        let progress = context.state.elapsedTime / context.attributes.timerDuration
-
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(Color.secondary.opacity(0.3))
-
-                Rectangle()
-                    .fill(Color.blue)
-                    .frame(width: geometry.size.width * CGFloat(min(progress, 1.0)))
-            }
-        }
-        .frame(height: 8)
-        .cornerRadius(4)
-    }
-
-    private func timerText(context: ActivityViewContext<TimerActivityAttributes>) -> String {
-        let remaining = context.attributes.timerDuration - context.state.elapsedTime
-        return max(0, remaining).formattedTime()
+    private func formatTime(_ interval: TimeInterval) -> String {
+        let totalSeconds = Int(max(0, interval))
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

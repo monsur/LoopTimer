@@ -72,6 +72,32 @@ class TimerService: ObservableObject {
         clearSavedState()
     }
 
+    // MARK: - State Restoration from Live Activity
+
+    func restoreRunningState(duration: TimeInterval, elapsedTime: TimeInterval, additionalLoops: Int = 0) {
+        guard state == .idle else { return }
+
+        self.timerDuration = duration
+        self.elapsedTime = elapsedTime
+        self.pausedElapsedTime = elapsedTime
+        self.completedLoops += additionalLoops
+        self.startDate = Date()
+        self.state = .running
+        startTimer()
+        saveState()
+    }
+
+    func restorePausedState(duration: TimeInterval, elapsedTime: TimeInterval) {
+        guard state == .idle else { return }
+
+        self.timerDuration = duration
+        self.elapsedTime = elapsedTime
+        self.pausedElapsedTime = elapsedTime
+        self.startDate = nil
+        self.state = .paused
+        saveState()
+    }
+
     var remainingTime: TimeInterval {
         return max(0, timerDuration - elapsedTime)
     }
